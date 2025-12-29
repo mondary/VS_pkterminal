@@ -2,7 +2,7 @@
   "name": "open-terminal-editor-tab",
   "displayName": "Open Terminal in Editor Tab",
   "description": "Adds an editor toolbar button to open a terminal in a new editor tab.",
-  "version": "0.0.8",
+  "version": "0.1.0",
   "publisher": "local",
   "engines": { "vscode": "^1.85.0" },
   "categories": ["Other"],
@@ -13,10 +13,32 @@
     "onCommand:openTerminalEditor.openOpenCode",
     "onCommand:openTerminalEditor.openOpenSpec",
     "onCommand:openTerminalEditor.openQwen",
-    "onCommand:openTerminalEditor.openClaude"
+    "onCommand:openTerminalEditor.openClaude",
+    "onView:openTerminalEditor.llmPanel"
   ],
   "main": "./dist/extension.js",
   "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "openTerminalEditor.llmContainer",
+          "title": "LLMs",
+          "icon": {
+            "light": "resources/llm-light.svg",
+            "dark": "resources/llm-dark.svg"
+          }
+        }
+      ]
+    },
+    "views": {
+      "openTerminalEditor.llmContainer": [
+        {
+          "id": "openTerminalEditor.llmPanel",
+          "name": "LLM Launcher",
+          "type": "webview"
+        }
+      ]
+    },
     "commands": [
       {
         "command": "openTerminalEditor.openInEditorTab",
@@ -58,32 +80,32 @@
       "editor/title": [
         {
           "command": "openTerminalEditor.openCodex",
-          "when": "true",
+          "when": "openTerminalEditor.showCodex == true",
           "group": "navigation@-6"
         },
         {
           "command": "openTerminalEditor.openGemini",
-          "when": "true",
+          "when": "openTerminalEditor.showGemini == true",
           "group": "navigation@-5"
         },
         {
           "command": "openTerminalEditor.openOpenCode",
-          "when": "true",
+          "when": "openTerminalEditor.showOpenCode == true",
           "group": "navigation@-4"
         },
         {
           "command": "openTerminalEditor.openOpenSpec",
-          "when": "true",
+          "when": "openTerminalEditor.showOpenSpec == true",
           "group": "navigation@-3"
         },
         {
           "command": "openTerminalEditor.openQwen",
-          "when": "true",
+          "when": "openTerminalEditor.showQwen == true",
           "group": "navigation@-2"
         },
         {
           "command": "openTerminalEditor.openClaude",
-          "when": "true",
+          "when": "openTerminalEditor.showClaude == true",
           "group": "navigation@-1"
         },
         {
@@ -92,6 +114,41 @@
           "group": "navigation@0"
         }
       ]
+    },
+    "configuration": {
+      "title": "Open Terminal in Editor Tab",
+      "properties": {
+        "openTerminalEditor.showCodex": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show the Codex button in the editor title bar."
+        },
+        "openTerminalEditor.showGemini": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show the Gemini button in the editor title bar."
+        },
+        "openTerminalEditor.showOpenCode": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show the OpenCode button in the editor title bar."
+        },
+        "openTerminalEditor.showOpenSpec": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show the OpenSpec button in the editor title bar."
+        },
+        "openTerminalEditor.showQwen": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show the Qwen button in the editor title bar."
+        },
+        "openTerminalEditor.showClaude": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show the Claude button in the editor title bar."
+        }
+      }
     }
   },
   "scripts": {

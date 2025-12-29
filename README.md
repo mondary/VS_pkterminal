@@ -24,7 +24,7 @@ VSIX output is written to `release/`.
 Use a single-line command (no line breaks):
 
 ```bash
-"/Applications/Vibe/vibe Antigravity.app/Contents/Resources/app/bin/antigravity" --install-extension "/Users/clm/Documents/GitHub/EXTENSIONS/VS_openterminal/release/open-terminal-editor-tab-0.0.8.vsix"
+"/Applications/Vibe/vibe Antigravity.app/Contents/Resources/app/bin/antigravity" --install-extension "/Users/clm/Documents/GitHub/EXTENSIONS/VS_openterminal/release/open-terminal-editor-tab-0.1.0.vsix"
 ```
 
 ## Commands Used (Build + Package + Install)
@@ -34,7 +34,7 @@ cd extension
 npm install
 npm run build
 npm run release
-"/Applications/Vibe/vibe Antigravity.app/Contents/Resources/app/bin/antigravity" --install-extension "/Users/clm/Documents/GitHub/EXTENSIONS/VS_openterminal/release/open-terminal-editor-tab-0.0.8.vsix"
+"/Applications/Vibe/vibe Antigravity.app/Contents/Resources/app/bin/antigravity" --install-extension "/Users/clm/Documents/GitHub/EXTENSIONS/VS_openterminal/release/open-terminal-editor-tab-0.1.0.vsix"
 ```
 
 ## Reload Window
@@ -42,9 +42,14 @@ npm run release
 - Command Palette: `Reload Window`
 - Shortcut: Cmd+Shift+P then type `Reload Window`
 
+## Sidebar Panel and Settings
+
+- Open the **LLMs** view in the Activity Bar to toggle each button and see install links.
+- Settings: search for `openTerminalEditor.show*` in Settings to show/hide each LLM button.
+
 ## Usage
 
-- In the editor title bar, click any of the AI buttons (Codex, Gemini, OpenCode, OpenSpec, Qwen, Claude) to open a new editor-area terminal running the matching command.
+- In the editor title bar, click any of the AI buttons (Codex, Gemini, OpenCode, OpenSpec, Qwen, Claude) to open a new editor-area terminal running the matching command, with the matching icon on the terminal tab.
 - Use the terminal icon to open a plain terminal in a new editor tab.
 - Commands are named:
   - "Open Codex Terminal in New Editor Tab"
@@ -54,3 +59,5 @@ npm run release
   - "Open Qwen Terminal in New Editor Tab"
   - "Open Claude Terminal in New Editor Tab"
   - "Open Terminal in New Editor Tab"
+
+OpenSpec runs `openspec init` when its button is clicked.
