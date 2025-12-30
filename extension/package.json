@@ -2,7 +2,7 @@
   "name": "open-terminal-editor-tab",
   "displayName": "Open Terminal in Editor Tab",
   "description": "Adds an editor toolbar button to open a terminal in a new editor tab.",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "publisher": "local",
   "engines": { "vscode": "^1.85.0" },
   "categories": ["Other"],

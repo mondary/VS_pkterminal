@@ -24,7 +24,7 @@ VSIX output is written to `release/`.
 Use a single-line command (no line breaks):
 
 ```bash
-"/Applications/Vibe/vibe Antigravity.app/Contents/Resources/app/bin/antigravity" --install-extension "/Users/clm/Documents/GitHub/EXTENSIONS/VS_openterminal/release/open-terminal-editor-tab-0.1.5.vsix"
+"/Applications/Vibe/vibe Antigravity.app/Contents/Resources/app/bin/antigravity" --install-extension "/Users/clm/Documents/GitHub/EXTENSIONS/VS_openterminal/release/open-terminal-editor-tab-0.1.6.vsix"
 ```
 
 ## Commands Used (Build + Package + Install)
@@ -34,7 +34,7 @@ cd extension
 npm install
 npm run build
 npm run release
-"/Applications/Vibe/vibe Antigravity.app/Contents/Resources/app/bin/antigravity" --install-extension "/Users/clm/Documents/GitHub/EXTENSIONS/VS_openterminal/release/open-terminal-editor-tab-0.1.5.vsix"
+"/Applications/Vibe/vibe Antigravity.app/Contents/Resources/app/bin/antigravity" --install-extension "/Users/clm/Documents/GitHub/EXTENSIONS/VS_openterminal/release/open-terminal-editor-tab-0.1.6.vsix"
 ```
 
 ## Reload Window
@@ -47,6 +47,7 @@ npm run release
 - Open the **LLMs** view in the Activity Bar to toggle each button, see logos, and open install links.
 - Click any install command to open a new terminal tab with the command pre-filled.
 - Settings: search for `openTerminalEditor.show*` in Settings to show/hide each LLM button.
+ - The LLM launcher UI uses logo cards, toggle switches, and clickable install commands.
 
 ## Terminal Split Actions
 

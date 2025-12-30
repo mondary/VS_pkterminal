@@ -246,7 +246,12 @@ class LlmPanelProvider implements vscode.WebviewViewProvider {
           vscode.Uri.joinPath(this.extensionUri, "resources", entry.icon)
         );
         const installs = entry.installs
-          .map((install) => `<code>${escapeHtml(install)}</code>`)
+          .map((install) => {
+            const escaped = escapeHtml(install);
+            return `<button class="command" data-command="${escapeAttribute(
+              install
+            )}" type="button"><span class="cmd">${escaped}</span><span class="run">Run</span></button>`;
+          })
           .join("");
         const notes = entry.notes
           ? entry.notes
@@ -265,12 +270,15 @@ class LlmPanelProvider implements vscode.WebviewViewProvider {
         return `
         <section class="card">
           <div class="header">
-            <label class="toggle">
+            <div class="title">
               <img class="logo" src="${iconUri}" alt="${entry.name} logo" />
+              <div class="name">${entry.name}</div>
+            </div>
+            <label class="toggle">
               <input type="checkbox" data-key="${entry.key}" ${
           state[entry.key as keyof VisibilityState] ? "checked" : ""
         } />
-              <span>${entry.name}</span>
+              <span class="switch"></span>
             </label>
             <button class="link-button" data-url="${entry.url}" type="button">
               Website
@@ -292,8 +300,14 @@ class LlmPanelProvider implements vscode.WebviewViewProvider {
     <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src ${webview.cspSource}; style-src 'unsafe-inline'; script-src 'nonce-${nonce}';" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <style>
+      :root {
+        --accent: var(--vscode-textLink-foreground);
+        --card-bg: color-mix(in srgb, var(--vscode-sideBar-background) 92%, var(--accent) 8%);
+        --chip-bg: color-mix(in srgb, var(--vscode-textBlockQuote-background) 90%, var(--accent) 10%);
+        --shadow: 0 6px 20px color-mix(in srgb, #000 20%, transparent);
+      }
       body {
-        font-family: var(--vscode-font-family);
+        font-family: "Space Grotesk", var(--vscode-font-family);
         color: var(--vscode-foreground);
         padding: 12px;
       }
@@ -308,7 +322,8 @@ class LlmPanelProvider implements vscode.WebviewViewProvider {
         border-radius: 8px;
         padding: 10px;
         margin-bottom: 10px;
-        background: var(--vscode-sideBar-background);
+        background: var(--card-bg);
+        box-shadow: var(--shadow);
       }
       .header {
         display: flex;
@@ -317,7 +332,7 @@ class LlmPanelProvider implements vscode.WebviewViewProvider {
         gap: 8px;
         margin-bottom: 8px;
       }
-      .header label {
+      .title {
         display: flex;
         align-items: center;
         gap: 8px;
@@ -325,14 +340,51 @@ class LlmPanelProvider implements vscode.WebviewViewProvider {
       .logo {
         width: 18px;
         height: 18px;
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.35));
+      }
+      .name {
+        font-size: 13px;
+        font-weight: 600;
+        letter-spacing: 0.01em;
+      }
+      .toggle {
+        display: inline-flex;
+        align-items: center;
       }
       .toggle input {
-        margin: 0;
+        position: absolute;
+        opacity: 0;
+      }
+      .switch {
+        width: 34px;
+        height: 18px;
+        background: color-mix(in srgb, var(--vscode-input-background) 70%, #000 30%);
+        border-radius: 999px;
+        position: relative;
+        border: 1px solid var(--vscode-panel-border);
+        transition: background 0.2s ease;
+      }
+      .switch::after {
+        content: "";
+        position: absolute;
+        top: 1px;
+        left: 1px;
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        background: #fff;
+        transition: transform 0.2s ease;
+      }
+      .toggle input:checked + .switch {
+        background: var(--accent);
+      }
+      .toggle input:checked + .switch::after {
+        transform: translateX(16px);
       }
       .link-button {
         color: var(--vscode-textLink-foreground);
         background: transparent;
-        border: 1px solid var(--vscode-textLink-foreground);
+        border: 1px solid color-mix(in srgb, var(--accent) 70%, #fff 30%);
         border-radius: 6px;
         padding: 2px 8px;
         cursor: pointer;
@@ -342,14 +394,29 @@ class LlmPanelProvider implements vscode.WebviewViewProvider {
         display: grid;
         gap: 6px;
       }
-      code {
-        display: block;
-        background: var(--vscode-textBlockQuote-background);
+      .command {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 8px;
+        align-items: center;
+        background: var(--chip-bg);
         padding: 6px 8px;
-        border-radius: 6px;
+        border-radius: 8px;
+        border: 1px solid var(--vscode-panel-border);
         font-size: 11px;
-        overflow-x: auto;
+        color: inherit;
         cursor: pointer;
+      }
+      .cmd {
+        font-family: "JetBrains Mono", var(--vscode-editor-font-family);
+        overflow-x: auto;
+        white-space: nowrap;
+      }
+      .run {
+        font-size: 10px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--accent);
       }
       .notes {
         display: grid;
@@ -388,13 +455,13 @@ class LlmPanelProvider implements vscode.WebviewViewProvider {
         });
       });
       document.querySelectorAll('.installs').forEach((list) => {
-        list.querySelectorAll('code').forEach((code) => {
-          code.addEventListener('click', () => {
+        list.querySelectorAll('.command').forEach((button) => {
+          button.addEventListener('click', () => {
             vscode.postMessage({
               type: 'runCommand',
               key: list.dataset.key,
               name: list.dataset.name,
-              command: code.innerText,
+              command: button.dataset.command,
             });
           });
         });
@@ -412,6 +479,10 @@ function escapeHtml(value: string): string {
     .replace(/>/g, "&gt;")
     .replace(/\"/g, "&quot;")
     .replace(/'/g, "&#39;");
+}
+
+function escapeAttribute(value: string): string {
+  return escapeHtml(value);
 }
 
 function getNonce(): string {
