@@ -1,12 +1,17 @@
 {
-  "name": "vs_pkterminal",
+  "name": "vs-pkterminal",
   "displayName": "VS_pkterminal",
-  "description": "Adds editor title-bar buttons to open a terminal in a new editor tab.",
-  "version": "1.0.0",
+  "description": "Adds editor title-bar buttons to open terminals in new editor tabs with LLM integration.",
+  "version": "1.0.10",
   "publisher": "local",
   "icon": "icon.png",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/YOUR_USERNAME/VS_pkterminal"
+  },
   "engines": { "vscode": "^1.85.0" },
   "categories": ["Other"],
+  "keywords": ["terminal", "llm", "ai", "editor", "tab", "split", "codex", "claude", "gemini", "opencode"],
   "activationEvents": [
     "onCommand:openTerminalEditor.openInEditorTab",
     "onCommand:openTerminalEditor.openCodex",
@@ -28,10 +33,7 @@
         {
           "id": "openTerminalEditor.llmActivity",
           "title": "LLMs",
-          "icon": {
-            "light": "resources/llm-light.svg",
-            "dark": "resources/llm-dark.svg"
-          }
+          "icon": "$(robot)"
         }
       ]
     },
@@ -233,7 +235,7 @@
   "scripts": {
     "build": "tsc -p .",
     "watch": "tsc -w -p .",
-    "package": "mkdir -p ../release && vsce package -o ../release/${npm_package_name}-${npm_package_version}.vsix",
+    "package": "mkdir -p ../release && vsce package -o ../release/VS_pkterminal-${npm_package_version}.vsix",
     "release": "npm run build && npm run package"
   },
   "devDependencies": {

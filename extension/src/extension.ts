@@ -66,7 +66,7 @@ async function updateTerminalEditorContext() {
 function createEditorTerminal(
   command?: string,
   name?: string,
-  iconPath?: vscode.Uri
+  iconPath?: vscode.TerminalOptions["iconPath"]
 ) {
   const terminal = vscode.window.createTerminal({
     name,
