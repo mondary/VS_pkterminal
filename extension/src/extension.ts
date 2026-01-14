@@ -1,7 +1,4 @@
 import * as vscode from "vscode";
-import { execFile } from "node:child_process";
-import { promisify } from "node:util";
-
 const COMMAND_ID = "openTerminalEditor.openInEditorTab";
 const CODEX_COMMAND_ID = "openTerminalEditor.openCodex";
 const GEMINI_COMMAND_ID = "openTerminalEditor.openGemini";
@@ -13,15 +10,6 @@ const SPLIT_LEFT_COMMAND_ID = "openTerminalEditor.splitLeft";
 const SPLIT_RIGHT_COMMAND_ID = "openTerminalEditor.splitRight";
 const SPLIT_UP_COMMAND_ID = "openTerminalEditor.splitUp";
 const SPLIT_DOWN_COMMAND_ID = "openTerminalEditor.splitDown";
-const FALLBACK_EMOJI = "";
-const USAGE_KEYS = [
-  "codex",
-  "gemini",
-  "openCode",
-  "openSpec",
-  "qwen",
-  "claude",
-] as const;
 
 const VISIBILITY_KEYS = {
   codex: "openTerminalEditor.showCodex",
@@ -33,37 +21,12 @@ const VISIBILITY_KEYS = {
 } as const;
 
 type VisibilityState = Record<keyof typeof VISIBILITY_KEYS, boolean>;
-type UsageKey = (typeof USAGE_KEYS)[number];
-type UsageState = {
-  remainingPercent?: number;
-  updatedAt?: Date;
-  source?: string;
-};
-type UsageSnapshot = Record<UsageKey, UsageState>;
 type CustomLauncher = {
   id: string;
   name: string;
   command: string;
   icon: string;
 };
-
-const PROVIDER_LABELS: Record<UsageKey, string> = {
-  codex: "Codex",
-  gemini: "Gemini",
-  openCode: "OpenCode",
-  openSpec: "OpenSpec",
-  qwen: "Qwen",
-  claude: "Claude",
-};
-
-const CLI_PROVIDER_MAP: Record<string, UsageKey> = {
-  codex: "codex",
-  claude: "claude",
-  gemini: "gemini",
-};
-
-const execFileAsync = promisify(execFile);
-const CODEX_USAGE_URL = "https://chatgpt.com/codex/settings/usage";
 
 function isEditorLocation(
   location:
@@ -142,158 +105,6 @@ async function updateVisibilityContexts() {
   );
 }
 
-function createEmptyUsageSnapshot(): UsageSnapshot {
-  return {
-    codex: {},
-    gemini: {},
-    openCode: {},
-    openSpec: {},
-    qwen: {},
-    claude: {},
-  };
-}
-
-function formatUsage(state?: UsageState): string {
-  if (!state || state.remainingPercent === undefined) {
-    return FALLBACK_EMOJI;
-  }
-  const clamped = Math.max(0, Math.min(100, state.remainingPercent));
-  return `${Math.round(clamped)}%`;
-}
-
-function formatTerminalName(name: string, state?: UsageState): string {
-  const usage = formatUsage(state);
-  return usage ? `${name} ${usage}` : name;
-}
-
-function extractJsonArray(output: string): string | null {
-  const start = output.indexOf("[");
-  const end = output.lastIndexOf("]");
-  if (start === -1 || end === -1 || end <= start) {
-    return null;
-  }
-  return output.slice(start, end + 1);
-}
-
-async function fetchUsageFromCodexBar(
-  binaryPath: string
-): Promise<Partial<UsageSnapshot>> {
-  try {
-    const { stdout } = await execFileAsync(
-      binaryPath,
-      ["usage", "--format", "json", "--provider", "all"],
-      {
-        timeout: 15000,
-        maxBuffer: 5 * 1024 * 1024,
-        encoding: "utf8",
-      }
-    );
-    if (!stdout) {
-      return {};
-    }
-    const json = extractJsonArray(stdout);
-    if (!json) {
-      return {};
-    }
-    const payload = JSON.parse(json) as Array<{
-      provider?: string;
-      source?: string;
-      usage?: { primary?: { usedPercent?: number } };
-    }>;
-    const next: Partial<UsageSnapshot> = {};
-    const now = new Date();
-    for (const item of payload) {
-      if (!item.provider) {
-        continue;
-      }
-      const key = CLI_PROVIDER_MAP[item.provider];
-      if (!key) {
-        continue;
-      }
-      const used = item.usage?.primary?.usedPercent;
-      if (typeof used !== "number") {
-        next[key] = { updatedAt: now, source: item.source };
-        continue;
-      }
-      next[key] = {
-        remainingPercent: Math.max(0, 100 - used),
-        updatedAt: now,
-        source: item.source,
-      };
-    }
-    return next;
-  } catch {
-    return {};
-  }
-}
-
-class UsageService {
-  private snapshot: UsageSnapshot = createEmptyUsageSnapshot();
-  private timer?: NodeJS.Timeout;
-  private readonly emitter = new vscode.EventEmitter<UsageSnapshot>();
-
-  readonly onDidUpdate = this.emitter.event;
-
-  async refresh() {
-    const config = vscode.workspace.getConfiguration("openTerminalEditor");
-    const binary = config.get("codexbarPath", "codexbar");
-    const partial = await fetchUsageFromCodexBar(binary);
-    this.snapshot = { ...createEmptyUsageSnapshot(), ...partial };
-    this.emitter.fire(this.snapshot);
-  }
-
-  start() {
-    void this.refresh();
-    const config = vscode.workspace.getConfiguration("openTerminalEditor");
-    const minutes = Math.max(1, config.get("usageRefreshMinutes", 5));
-    this.timer = setInterval(() => void this.refresh(), minutes * 60_000);
-  }
-
-  restart() {
-    this.stop();
-    this.start();
-  }
-
-  stop() {
-    if (this.timer) {
-      clearInterval(this.timer);
-      this.timer = undefined;
-    }
-  }
-
-  getSnapshot(): UsageSnapshot {
-    return this.snapshot;
-  }
-}
-
-class UsageViewProvider implements vscode.TreeDataProvider<vscode.TreeItem> {
-  private readonly emitter = new vscode.EventEmitter<void>();
-  readonly onDidChangeTreeData = this.emitter.event;
-
-  constructor(
-    private readonly iconMap: Record<UsageKey, vscode.Uri>,
-    private readonly usageService: UsageService
-  ) {}
-
-  refresh() {
-    this.emitter.fire();
-  }
-
-  getChildren(): vscode.TreeItem[] {
-    const snapshot = this.usageService.getSnapshot();
-    return USAGE_KEYS.map((key) => {
-      const item = new vscode.TreeItem(PROVIDER_LABELS[key]);
-      item.description = formatUsage(snapshot[key]);
-      item.iconPath = this.iconMap[key];
-      return item;
-    });
-  }
-
-  getTreeItem(element: vscode.TreeItem): vscode.TreeItem {
-    return element;
-  }
-}
-
 function getCustomLaunchers(): CustomLauncher[] {
   const config = vscode.workspace.getConfiguration("openTerminalEditor");
   const entries = config.get<CustomLauncher[]>("customLaunchers", []);
@@ -321,7 +132,6 @@ function resolveCustomIcon(icon: string): { type: "codicon" | "url"; value: stri
 
 class LlmPanelProvider implements vscode.WebviewViewProvider {
   private view?: vscode.WebviewView;
-  private usage: UsageSnapshot = createEmptyUsageSnapshot();
 
   constructor(
     private readonly extensionUri: vscode.Uri,
@@ -360,13 +170,9 @@ class LlmPanelProvider implements vscode.WebviewViewProvider {
         typeof message.name === "string"
       ) {
         const icon = message.key ? this.iconMap[message.key] : undefined;
-        const usage =
-          message.key && message.key in this.usage
-            ? this.usage[message.key as UsageKey]
-            : undefined;
         createEditorTerminal(
           message.command,
-          formatTerminalName(message.name, usage),
+          message.name,
           icon
         );
         return;
@@ -410,11 +216,6 @@ class LlmPanelProvider implements vscode.WebviewViewProvider {
       }
     });
 
-    this.render();
-  }
-
-  updateUsage(snapshot: UsageSnapshot) {
-    this.usage = snapshot;
     this.render();
   }
 
@@ -517,7 +318,6 @@ class LlmPanelProvider implements vscode.WebviewViewProvider {
         const iconUri = webview.asWebviewUri(
           vscode.Uri.joinPath(this.extensionUri, "resources", entry.icon)
         );
-        const usageText = formatUsage(this.usage[entry.key]);
         const installs = entry.installs
           .map((install) => {
             const escaped = escapeHtml(install);
@@ -546,7 +346,6 @@ class LlmPanelProvider implements vscode.WebviewViewProvider {
             <div class="title">
               <img class="logo" src="${iconUri}" alt="${entry.name} logo" />
               <div class="name">${entry.name}</div>
-              <div class="usage">${usageText}</div>
             </div>
             <label class="toggle">
               <input type="checkbox" data-key="${entry.key}" ${
@@ -656,14 +455,6 @@ class LlmPanelProvider implements vscode.WebviewViewProvider {
         font-size: 13px;
         font-weight: 600;
         letter-spacing: 0.01em;
-      }
-      .usage {
-        font-size: 11px;
-        padding: 2px 6px;
-        border-radius: 999px;
-        background: var(--chip-bg);
-        border: 1px solid var(--vscode-panel-border);
-        color: var(--vscode-descriptionForeground);
       }
       .toggle {
         display: inline-flex;
@@ -970,28 +761,10 @@ export function activate(context: vscode.ExtensionContext) {
     qwen: qwenIcon,
     claude: claudeIcon,
   });
-  const usageService = new UsageService();
-  const usageViewProvider = new UsageViewProvider(
-    {
-      codex: codexIcon,
-      gemini: geminiIcon,
-      openCode: openCodeIcon,
-      openSpec: openSpecIcon,
-      qwen: qwenIcon,
-      claude: claudeIcon,
-    },
-    usageService
-  );
   context.subscriptions.push(
     vscode.window.registerWebviewViewProvider(
       "openTerminalEditor.llmPanelView",
       llmPanelProvider
-    )
-  );
-  context.subscriptions.push(
-    vscode.window.registerTreeDataProvider(
-      "openTerminalEditor.usageView",
-      usageViewProvider
     )
   );
   const openTerminal = vscode.commands.registerCommand(
@@ -1014,7 +787,7 @@ export function activate(context: vscode.ExtensionContext) {
       try {
         createEditorTerminal(
           "codex",
-          formatTerminalName("Codex", usageService.getSnapshot().codex),
+          "Codex",
           codexIcon
         );
       } catch (error) {
@@ -1030,7 +803,7 @@ export function activate(context: vscode.ExtensionContext) {
       try {
         createEditorTerminal(
           "gemini",
-          formatTerminalName("Gemini", usageService.getSnapshot().gemini),
+          "Gemini",
           geminiIcon
         );
       } catch (error) {
@@ -1046,7 +819,7 @@ export function activate(context: vscode.ExtensionContext) {
       try {
         createEditorTerminal(
           "opencode",
-          formatTerminalName("OpenCode", usageService.getSnapshot().openCode),
+          "OpenCode",
           openCodeIcon
         );
       } catch (error) {
@@ -1062,7 +835,7 @@ export function activate(context: vscode.ExtensionContext) {
       try {
         createEditorTerminal(
           "openspec init",
-          formatTerminalName("OpenSpec", usageService.getSnapshot().openSpec),
+          "OpenSpec",
           openSpecIcon
         );
       } catch (error) {
@@ -1078,7 +851,7 @@ export function activate(context: vscode.ExtensionContext) {
       try {
         createEditorTerminal(
           "qwen",
-          formatTerminalName("Qwen", usageService.getSnapshot().qwen),
+          "Qwen",
           qwenIcon
         );
       } catch (error) {
@@ -1094,7 +867,7 @@ export function activate(context: vscode.ExtensionContext) {
       try {
         createEditorTerminal(
           "claude",
-          formatTerminalName("Claude", usageService.getSnapshot().claude),
+          "Claude",
           claudeIcon
         );
       } catch (error) {
@@ -1147,7 +920,6 @@ export function activate(context: vscode.ExtensionContext) {
       if (event.affectsConfiguration("openTerminalEditor")) {
         updateVisibilityContexts();
         llmPanelProvider.render();
-        usageService.restart();
       }
     })
   );
@@ -1161,13 +933,6 @@ export function activate(context: vscode.ExtensionContext) {
     })
   );
 
-  usageService.onDidUpdate((snapshot) => {
-    llmPanelProvider.updateUsage(snapshot);
-    usageViewProvider.refresh();
-  });
-
-  usageService.start();
-  context.subscriptions.push({ dispose: () => usageService.stop() });
 }
 
 export function deactivate() {}

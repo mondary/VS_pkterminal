@@ -1,8 +1,8 @@
 {
-  "name": "open-terminal-editor-tab",
-  "displayName": "Open Terminal in Editor Tab",
-  "description": "Adds an editor toolbar button to open a terminal in a new editor tab.",
-  "version": "0.2.1",
+  "name": "vs_pkterminal",
+  "displayName": "VS_pkterminal",
+  "description": "Adds editor title-bar buttons to open a terminal in a new editor tab.",
+  "version": "1.0.0",
   "publisher": "local",
   "icon": "icon.png",
   "engines": { "vscode": "^1.85.0" },
@@ -19,8 +19,7 @@
     "onCommand:openTerminalEditor.splitRight",
     "onCommand:openTerminalEditor.splitUp",
     "onCommand:openTerminalEditor.splitDown",
-    "onView:openTerminalEditor.llmPanelView",
-    "onView:openTerminalEditor.usageView"
+    "onView:openTerminalEditor.llmPanelView"
   ],
   "main": "./dist/extension.js",
   "contributes": {
@@ -42,10 +41,6 @@
           "id": "openTerminalEditor.llmPanelView",
           "name": "LLM Launcher",
           "type": "webview"
-        },
-        {
-          "id": "openTerminalEditor.usageView",
-          "name": "Usage"
         }
       ]
     },
@@ -217,17 +212,6 @@
           "type": "boolean",
           "default": true,
           "description": "Show the Claude button in the editor title bar."
-        },
-        "openTerminalEditor.codexbarPath": {
-          "type": "string",
-          "default": "codexbar",
-          "description": "Path to the CodexBar CLI binary used for usage data."
-        },
-        "openTerminalEditor.usageRefreshMinutes": {
-          "type": "number",
-          "default": 5,
-          "minimum": 1,
-          "description": "How often to refresh LLM usage data (minutes)."
         },
         "openTerminalEditor.customLaunchers": {
           "type": "array",
