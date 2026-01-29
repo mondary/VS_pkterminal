@@ -1,88 +1,61 @@
 # VS_pkterminal
 
-![VS_pkterminal icon](https://raw.githubusercontent.com/mondary/VS_pkterminal/main/icon.png)
+![Project icon](icon.png)
 
-**VS_pkterminal** - Adds editor title-bar buttons to open new terminals in the editor area (not the bottom panel) with LLM integration.
+✨ Extension VS Code simple et efficace pour ouvrir des terminaux **dans l’éditeur** (pas en bas), avec des boutons LLM prêts à l’emploi.
 
-Store links:
-- VS Code Marketplace: https://marketplace.visualstudio.com/publishers/Cmondary
-- Open VSX: https://open-vsx.org/namespace/Cmondary
-- GitHub: https://github.com/mondary?tab=repositories&q=vs_
+## ✅ Fonctionnalités
 
-## What it does
+- 🧭 Boutons dans la title bar pour ouvrir un terminal en **nouvel onglet** dans l’éditeur.
+- 🤖 Launchers LLM (Codex, Gemini, OpenCode, OpenSpec, Qwen, Claude) avec icônes dédiées.
+- 🧰 Bouton Terminal classique pour ouvrir un terminal neutre.
+- 🎛️ Panneau **LLMs** avec logos, toggles et commandes d’installation cliquables.
+- 🧩 Launchers custom (nom, commande, icône URL/codicon).
+- 🪟 Split gauche/droite/haut/bas via clic droit dans l’éditeur terminal.
 
-VS_pkterminal adds a set of buttons in the editor title bar to open new terminal **tabs** directly in the editor area (not the bottom panel). It includes LLM launchers with branded icons and optional install commands, plus a plain terminal button.
+## 🧠 Utilisation
 
-## How to use
+- Clique un bouton LLM → nouveau terminal dans l’éditeur avec la commande correspondante.
+- Clique le bouton terminal → nouveau terminal standard.
+- OpenSpec lance `openspec init` quand le bouton est cliqué.
 
-- Click an AI button (Codex, Gemini, OpenCode, OpenSpec, Qwen, Claude) to open a new editor-area terminal running the matching command, with the matching icon on the terminal tab.
-- Click the terminal icon to open a plain terminal in a new editor tab.
-- Commands are named:
-  - "Open Codex Terminal in New Editor Tab"
-  - "Open Gemini Terminal in New Editor Tab"
-  - "Open OpenCode Terminal in New Editor Tab"
-  - "Open OpenSpec Terminal in New Editor Tab"
-  - "Open Qwen Terminal in New Editor Tab"
-  - "Open Claude Terminal in New Editor Tab"
-  - "Open Terminal in New Editor Tab"
+## ⚙️ Réglages
 
-OpenSpec runs `openspec init` when its button is clicked.
+- Paramètres : `openTerminalEditor.show*` pour afficher/masquer chaque bouton.
+- Launchers custom : `openTerminalEditor.customLaunchers`.
 
-## Build (for development)
+## 🧾 Commandes
 
-```bash
-cd extension
-npm install
-npm run build
-```
+- "Open Codex Terminal in New Editor Tab"
+- "Open Gemini Terminal in New Editor Tab"
+- "Open OpenCode Terminal in New Editor Tab"
+- "Open OpenSpec Terminal in New Editor Tab"
+- "Open Qwen Terminal in New Editor Tab"
+- "Open Claude Terminal in New Editor Tab"
+- "Open Terminal in New Editor Tab"
 
-## Package (VSIX)
+## 📦 Build & Package
 
 ```bash
 cd extension
 npm run release
 ```
 
-VSIX output is written to `release/`.
+Le .vsix est généré dans `release/`.
 
-## Install (Vibe Antigravity)
-
-Use a single-line command (no line breaks):
+## 🧪 Installation (Antigravity)
 
 ```bash
 "/Applications/Vibe/vibe Antigravity.app/Contents/Resources/app/bin/antigravity" --install-extension "./release/VS_pkterminal-1.0.15.vsix"
 ```
 
-## Commands Used (Build + Package + Install)
+## 🧾 Changelog
 
-```bash
-cd extension
-npm install
-npm run build
-npm run release
-"/Applications/Vibe/vibe Antigravity.app/Contents/Resources/app/bin/antigravity" --install-extension "./release/VS_pkterminal-1.0.15.vsix"
-```
+- 1.0.15 : README mis à jour, packaging release.
 
-## Reload Window
+## 🔗 Liens
 
-- Command Palette: `Reload Window`
-- Shortcut: Cmd+Shift+P then type `Reload Window`
-
-## Sidebar Panel and Settings
-
-- Open the **LLMs** view in the Activity Bar to toggle each button, see logos, and open install links.
-- The Activity Bar icon uses the codicon `$(sparkle)`.
-- Click any install command to open a new terminal tab with the command pre-filled.
-- Settings: search for `openTerminalEditor.show*` in Settings to show/hide each LLM button.
-- The LLM launcher UI uses logo cards, toggle switches, and clickable install commands.
-- Custom launchers: add name, command, and icon (URL or codicon) and use Save/Delete.
-- Settings: `openTerminalEditor.customLaunchers` stores custom entries.
-
-## Terminal Split Actions
-
-- Right-click a terminal editor tab or terminal editor area to split left/right/up/down.
-- Splits create a new editor group and automatically open a new terminal tab.
-
-## LLM Launcher Logos
-
-- If logos do not appear, ensure the extension version is `0.1.5` and reload the window.
+- VS Code Marketplace : https://marketplace.visualstudio.com/publishers/Cmondary
+- Open VSX : https://open-vsx.org/namespace/Cmondary
+- GitHub : https://github.com/mondary?tab=repositories&q=vs_
+- EN README : README_en.md
