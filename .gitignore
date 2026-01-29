@@ -21,6 +21,7 @@ skill_*.md
 .claude/
 .vscode/
 openspec/
+AGENTS.md
 
 # OS
 .DS_Store
