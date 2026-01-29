@@ -2,7 +2,7 @@
   "name": "vs-pkterminal",
   "displayName": "VS_pkterminal",
   "description": "Adds editor title-bar buttons to open terminals in new editor tabs with LLM integration.",
-  "version": "1.0.11",
+   "version": "1.0.13",
   "publisher": "Cmondary",
   "icon": "icon.png",
   "repository": {
@@ -83,20 +83,28 @@
         "icon": "resources/claude.svg"
       },
       {
+        "command": "openTerminalEditor.statusBarButton",
+        "title": "Open Terminal (Status Bar)"
+      },
+      {
         "command": "openTerminalEditor.splitLeft",
-        "title": "Split Terminal Left"
+        "title": "Split Terminal Left",
+        "icon": "$(arrow-left)"
       },
       {
         "command": "openTerminalEditor.splitRight",
-        "title": "Split Terminal Right"
+        "title": "Split Terminal Right",
+        "icon": "$(arrow-right)"
       },
       {
         "command": "openTerminalEditor.splitUp",
-        "title": "Split Terminal Up"
+        "title": "Split Terminal Up",
+        "icon": "$(arrow-up)"
       },
       {
         "command": "openTerminalEditor.splitDown",
-        "title": "Split Terminal Down"
+        "title": "Split Terminal Down",
+        "icon": "$(arrow-down)"
       }
     ],
     "menus": {

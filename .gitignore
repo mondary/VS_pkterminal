@@ -2,11 +2,9 @@
 node_modules/
 npm-debug.log*
 yarn-debug.log*
-yarn-error.log*import { Qwen } from '@lobehub/icons';
+yarn-error.log*
 
-export default () => <Qwen size={56} />;
-
-# TypeScript outputopen
+# TypeScript output
 extension/dist/
 
 # VS Code extension artifacts

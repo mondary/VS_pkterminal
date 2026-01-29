@@ -1,6 +1,7 @@
 import * as vscode from "vscode";
-const COMMAND_ID = "openTerminalEditor.openInEditorTab";
-const CODEX_COMMAND_ID = "openTerminalEditor.openCodex";
+  const COMMAND_ID = "openTerminalEditor.openInEditorTab";
+  const STATUS_BAR_BUTTON_ID = "openTerminalEditor.statusBarButton";
+  const CODEX_COMMAND_ID = "openTerminalEditor.openCodex";
 const GEMINI_COMMAND_ID = "openTerminalEditor.openGemini";
 const OPENCODE_COMMAND_ID = "openTerminalEditor.openOpenCode";
 const OPENSPEC_COMMAND_ID = "openTerminalEditor.openOpenSpec";
@@ -914,6 +915,17 @@ export function activate(context: vscode.ExtensionContext) {
   );
 
   context.subscriptions.push(splitLeft, splitRight, splitUp, splitDown);
+
+  const statusBarButton = vscode.window.createStatusBarItem(
+    STATUS_BAR_BUTTON_ID,
+    vscode.StatusBarAlignment.Left,
+    100
+  );
+  statusBarButton.text = "$(terminal) Term";
+  statusBarButton.tooltip = "Open Terminal in New Editor Tab";
+  statusBarButton.command = COMMAND_ID;
+  statusBarButton.show();
+  context.subscriptions.push(statusBarButton);
 
   context.subscriptions.push(
     vscode.workspace.onDidChangeConfiguration((event) => {
