@@ -17,7 +17,9 @@ releases/
 # Skills
 skill_*.md
 
-# OpenSpec
+# Local tooling
+.claude/
+.vscode/
 openspec/
 
 # OS
