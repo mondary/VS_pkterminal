@@ -25,6 +25,7 @@ AGENTS.md
 
 # OS
 .DS_Store
+.skills
 
 # Misc
 *.log
