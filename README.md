@@ -25,6 +25,7 @@
 
 - Paramètres : `openTerminalEditor.show*` pour afficher/masquer chaque bouton.
 - Launchers custom : `openTerminalEditor.customLaunchers`.
+- Délai de lancement : `openTerminalEditor.launchDelaySeconds` (secondes, défaut = 5) ou `openTerminalEditor.launchDelayMs` (ms).
 
 ## 🧾 Commandes
 
@@ -50,7 +51,7 @@ Le .vsix est généré dans `release/`.
 ### VS Code (CLI)
 
 ```bash
-code --install-extension "./release/VS_pkterminal-1.0.18.vsix"
+code --install-extension "./release/VS_pkterminal-1.0.21.vsix"
 ```
 
 ### Cursor (UI)
@@ -68,6 +69,9 @@ Ouvre le store d’extensions → glisse/dépose le `.vsix`.
 ## 🧾 Changelog
 
 - 1.0.18 : README commun (store = README racine).
+- 1.0.19 : Ajout d’un délai configurable avant l’exécution des commandes LLM.
+- 1.0.20 : Délai en secondes + attente du shell avant envoi de la commande.
+- 1.0.21 : Délai par défaut passé à 5 secondes.
 
 ## 🔗 Liens
 

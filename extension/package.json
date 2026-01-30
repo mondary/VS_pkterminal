@@ -2,7 +2,7 @@
   "name": "vs-pkterminal",
   "displayName": "VS_pkterminal",
   "description": "Open terminals in editor tabs with LLM launchers, a status bar shortcut, and split actions.",
-   "version": "1.0.18",
+   "version": "1.0.21",
   "publisher": "Cmondary",
   "license": "MIT",
   "icon": "icon.png",
@@ -239,6 +239,16 @@
               "icon": { "type": "string" }
             }
           }
+        },
+        "openTerminalEditor.launchDelayMs": {
+          "type": "number",
+          "default": 0,
+          "description": "Delay (ms) before auto-running launcher command after opening the terminal."
+        },
+        "openTerminalEditor.launchDelaySeconds": {
+          "type": "number",
+          "default": 5,
+          "description": "Delay (seconds) before auto-running launcher command after opening the terminal. Takes priority over launchDelayMs."
         }
       }
     }

@@ -46,7 +46,7 @@ async function updateTerminalEditorContext() {
         : false;
     await vscode.commands.executeCommand("setContext", "openTerminalEditor.terminalEditorActive", isEditorTerminal);
 }
-function createEditorTerminal(command, name, iconPath) {
+async function createEditorTerminal(command, name, iconPath) {
     const terminal = vscode.window.createTerminal({
         name,
         location: vscode.TerminalLocation.Editor,
@@ -54,8 +54,30 @@ function createEditorTerminal(command, name, iconPath) {
     });
     terminal.show(true);
     if (command) {
+        try {
+            await terminal.processId;
+        }
+        catch {
+            // If processId isn't available, still try to send the command after a delay.
+        }
+        const delayMs = getLaunchDelayMs();
+        if (delayMs > 0) {
+            await new Promise((resolve) => setTimeout(resolve, delayMs));
+        }
         terminal.sendText(command, true);
     }
+}
+function getLaunchDelayMs() {
+    const config = vscode.workspace.getConfiguration("openTerminalEditor");
+    const seconds = config.get("launchDelaySeconds", 0);
+    if (Number.isFinite(seconds) && seconds > 0) {
+        return Math.floor(seconds * 1000);
+    }
+    const millis = config.get("launchDelayMs", 0);
+    if (!Number.isFinite(millis) || millis <= 0) {
+        return 0;
+    }
+    return Math.floor(millis);
 }
 function getVisibilityState() {
     const config = vscode.workspace.getConfiguration("openTerminalEditor");

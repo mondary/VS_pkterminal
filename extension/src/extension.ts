@@ -64,7 +64,7 @@ async function updateTerminalEditorContext() {
   );
 }
 
-function createEditorTerminal(
+async function createEditorTerminal(
   command?: string,
   name?: string,
   iconPath?: vscode.TerminalOptions["iconPath"]
@@ -76,8 +76,30 @@ function createEditorTerminal(
   });
   terminal.show(true);
   if (command) {
+    try {
+      await terminal.processId;
+    } catch {
+      // If processId isn't available, still try to send the command after a delay.
+    }
+    const delayMs = getLaunchDelayMs();
+    if (delayMs > 0) {
+      await new Promise((resolve) => setTimeout(resolve, delayMs));
+    }
     terminal.sendText(command, true);
   }
+}
+
+function getLaunchDelayMs(): number {
+  const config = vscode.workspace.getConfiguration("openTerminalEditor");
+  const seconds = config.get<number>("launchDelaySeconds", 0);
+  if (Number.isFinite(seconds) && seconds > 0) {
+    return Math.floor(seconds * 1000);
+  }
+  const millis = config.get<number>("launchDelayMs", 0);
+  if (!Number.isFinite(millis) || millis <= 0) {
+    return 0;
+  }
+  return Math.floor(millis);
 }
 
 function getVisibilityState(): VisibilityState {
